@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Banking Digital Maturity Assessment</title>
+
+    <!-- Chart.js library for the radar chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            background: #f4f6f8;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: #17365d;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .instructions {
+            background: white;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .instructions h2 {
+            margin-top: 0;
+        }
+
+        .dimension {
+            background: white;
+            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .dimension h2 {
+            color: #17365d;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .dimension-description {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question:last-child {
+            margin-bottom: 0;
+        }
+
+        .question h3 {
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+
+        .answer {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #f5f6f8;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .answer:hover {
+            background: #e9eef5;
+        }
+
+        .answer input {
+            margin-right: 10px;
+        }
+
+        .submit-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+
+        button {
+            background: #17365d;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 7px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #102b4c;
+        }
+
+        #results {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-top: 30px;
+        }
+
+        #results h2 {
+            color: #17365d;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 850px;
+            height: 650px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .score-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .score-list li {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f5f6f8;
+            border-radius: 6px;
+        }
+
+        .profile-box {
+            background: #eef3f8;
+            border-left: 5px solid #17365d;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 5px;
+        }
+
+        .lowest-box {
+            background: #fff8e6;
+            border-left: 5px solid #d99a00;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 5px;
+        }
+
+        .error-message {
+            color: #b00020;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            color: #777;
+            padding: 30px 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Banking Digital Maturity Assessment</h1>
+    <p>Evaluate digital maturity across five banking capability dimensions</p>
+</header>
+
+
+<div class="container">
+
+    <!-- Instructions -->
+    <section class="instructions">
+
+        <h2>Instructions</h2>
+
+        <p>
+            Answer each question by selecting the option that best describes
+            your bank's current state. Each answer corresponds to a maturity
+            level from 1 to 5.
+        </p>
+
+        <p>
+            Please answer all questions before submitting the assessment.
+            Your results will show your maturity score across five dimensions,
+            a radar chart, your two lowest-scoring dimensions, and a strategic
+            interpretation.
+        </p>
+
+    </section>
+
+
+    <!-- Error message -->
+    <div id="errorMessage" class="error-message">
+        Please answer all 15 questions before viewing your results.
+    </div>
+
+
+    <!-- Assessment Form -->
+    <form id="assessmentForm">
+
+        <!-- JavaScript will generate the 15 questions here -->
+        <div id="questions"></div>
+
+
+        <div class="submit-container">
+            <button type="submit">
+                Calculate My Results
+            </button>
+        </div>
+
+    </form>
+
+
+    <!-- Results -->
+    <section id="results">
+
+        <h2>Your Banking Digital Maturity Results</h2>
+
+        <p>
+            Your scores represent the average maturity level across the three
+            questions in each dimension.
+        </p>
+
+
+        <!-- Radar Chart -->
+        <div class="chart-container">
+            <canvas id="maturityRadar"></canvas>
+        </div>
+
+
+        <!-- Score Summary -->
+        <div id="scoreSummary"></div>
+
+
+        <!-- Lowest Dimensions -->
+        <div id="lowestDimensions"></div>
+
+
+        <!-- Interpretation -->
+        <div id="interpretation"></div>
+
+    </section>
+
+</div>
+
+
+<footer>
+    Banking Digital Maturity Self-Assessment Tool
+</footer>
+
+
+<script>
+
+    /*
+    ============================================================
+    1. FIVE BANKING MATURITY DIMENSIONS
+    ============================================================
+    */
+
+    const dimensions = [
+
+        "Banking Data Infrastructure",
+
+        "Digital Banking and Customer Experience",
+
+        "Banking Process Automation",
+
+        "AI and Advanced Analytics Deployment",
+
+        "Organizational Change Capacity"
+
+    ];
+
+
+    /*
+    ============================================================
+    2. QUESTIONS AND ANSWER OPTIONS
+    ============================================================
+    */
+
+    const questions = [
+
+        // =====================================================
+        // DIMENSION 1: BANKING DATA INFRASTRUCTURE
+        // =====================================================
+
+        {
+            dimension: "Banking Data Infrastructure",
+
+            text: "How are customer, account, transaction, lending, and risk data combined when employees need information across multiple banking systems?",
+
+            options: [
+
+                {
+                    text: "Employees manually combine information using spreadsheets, exports, or separate system reports.",
+                    value: 1
+                },
+
+                {
+                    text: "Some systems exchange data, but departments still rely on separate datasets and manual reconciliation.",
+                    value: 2
+                },
+
+                {
+                    text: "Major banking systems feed standardized data into a centralized warehouse or data platform for organization-wide reporting and analytics.",
+                    value: 3
+                },
+
+                {
+                    text: "Automated pipelines and APIs connect major systems, with important data available across the organization in near real time.",
+                    value: 4
+                },
+
+                {
+                    text: "Major banking data is connected in a unified real-time environment and can be used across departments for analytics, AI, fraud detection, personalization, and automated processes without significant manual preparation.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Banking Data Infrastructure",
+
+            text: "How are updates to important customer and transaction data delivered to systems that need current information?",
+
+            options: [
+
+                {
+                    text: "Employees manually export or enter data when another system needs an update.",
+                    value: 1
+                },
+
+                {
+                    text: "Some systems exchange data automatically, but many important updates still depend on separate or delayed processes.",
+                    value: 2
+                },
+
+                {
+                    text: "Major data sources are consolidated through scheduled processes into a centralized data warehouse or platform.",
+                    value: 3
+                },
+
+                {
+                    text: "Automated pipelines and APIs make important data available across systems in near real time.",
+                    value: 4
+                },
+
+                {
+                    text: "Major banking data is continuously connected and available in real time across the enterprise without significant manual data movement.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Banking Data Infrastructure",
+
+            text: "How are data definitions, ownership, access, security, and quality handled across banking departments?",
+
+            options: [
+
+                {
+                    text: "Departments use their own definitions and processes, with no consistent ownership or organization-wide standards.",
+                    value: 1
+                },
+
+                {
+                    text: "Some common definitions or controls exist, but they vary across departments and systems.",
+                    value: 2
+                },
+
+                {
+                    text: "Standardized definitions and basic data-quality practices are established for major banking data.",
+                    value: 3
+                },
+
+                {
+                    text: "The bank has formal standards for data quality, ownership, access, security, and governance.",
+                    value: 4
+                },
+
+                {
+                    text: "Enterprise data governance is integrated into a unified data environment and supports secure use of data for analytics, AI, fraud detection, personalization, and automated processes.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        // =====================================================
+        // DIMENSION 2: DIGITAL BANKING AND CUSTOMER EXPERIENCE
+        // =====================================================
+
+        {
+            dimension: "Digital Banking and Customer Experience",
+
+            text: "What customer services can be completed without visiting a branch or speaking with an employee?",
+
+            options: [
+
+                {
+                    text: "Most services require a branch visit, phone call, or employee assistance.",
+                    value: 1
+                },
+
+                {
+                    text: "Customers can complete basic activities such as checking balances, transferring money, and paying bills digitally.",
+                    value: 2
+                },
+
+                {
+                    text: "Customers can complete more complex activities such as account applications and service requests digitally.",
+                    value: 3
+                },
+
+                {
+                    text: "Customers can complete complex services digitally, and customer information is used to personalize services and communications across channels.",
+                    value: 4
+                },
+
+                {
+                    text: "Customers can complete major banking activities digitally or move between digital and physical channels without restarting the process, while current customer information is used to adjust services and recommendations.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Digital Banking and Customer Experience",
+
+            text: "What happens when a customer starts a banking request in one channel and continues it in another?",
+
+            options: [
+
+                {
+                    text: "The new channel generally has no access to the previous interaction, so the customer must provide the information again.",
+                    value: 1
+                },
+
+                {
+                    text: "Some customer information is shared, but the customer often has to restart or repeat information.",
+                    value: 2
+                },
+
+                {
+                    text: "Important customer information is shared between channels, reducing repeated questions or data entry.",
+                    value: 3
+                },
+
+                {
+                    text: "Customer interactions are connected across mobile, web, branch, and customer service, with customer history used to personalize the interaction.",
+                    value: 4
+                },
+
+                {
+                    text: "The customer can move between channels without restarting the process, and each channel uses current information about the customer's request and context.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Digital Banking and Customer Experience",
+
+            text: "How does the bank use customer information and behavior to personalize digital interactions?",
+
+            options: [
+
+                {
+                    text: "Digital services and communications are mostly the same for all customers.",
+                    value: 1
+                },
+
+                {
+                    text: "The bank provides basic customer-specific information, such as account balances or transaction history, but does not systematically personalize recommendations.",
+                    value: 2
+                },
+
+                {
+                    text: "The bank uses customer information or segments to tailor selected digital services or communications.",
+                    value: 3
+                },
+
+                {
+                    text: "Customer information, transaction history, and behavior are systematically used to personalize services, recommendations, and communications.",
+                    value: 4
+                },
+
+                {
+                    text: "Current customer information is continuously used across channels to adjust services and recommendations while following privacy and compliance requirements.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        // =====================================================
+        // DIMENSION 3: BANKING PROCESS AUTOMATION
+        // =====================================================
+
+        {
+            dimension: "Banking Process Automation",
+
+            text: "How is work handled across the steps of major banking processes such as account opening, loan processing, servicing, or compliance review?",
+
+            options: [
+
+                {
+                    text: "Employees complete most steps manually using documents, emails, spreadsheets, or repeated data entry.",
+                    value: 1
+                },
+
+                {
+                    text: "Individual repetitive tasks are automated, but employees still manually coordinate many steps between systems or departments.",
+                    value: 2
+                },
+
+                {
+                    text: "Major processes use connected digital workflows that automatically move routine cases between systems, while employees handle exceptions and approvals.",
+                    value: 3
+                },
+
+                {
+                    text: "Major processes are automated from beginning to end across multiple systems and departments, with process performance and exceptions monitored through dashboards.",
+                    value: 4
+                },
+
+                {
+                    text: "Automated processes also use analytics or AI to route cases, identify unusual activity, prioritize work, or support decisions, with human review retained where required.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Banking Process Automation",
+
+            text: "How are exceptions or unusual cases handled when a routine banking process cannot be completed automatically?",
+
+            options: [
+
+                {
+                    text: "Employees manually identify and transfer exceptions between people or departments.",
+                    value: 1
+                },
+
+                {
+                    text: "Some exceptions are routed using workflow tools, but employees still manually determine many next steps.",
+                    value: 2
+                },
+
+                {
+                    text: "Connected workflows automatically route routine cases while employees handle identified exceptions and approvals.",
+                    value: 3
+                },
+
+                {
+                    text: "End-to-end workflows automatically identify, route, and track exceptions across systems, with performance monitored through operational dashboards.",
+                    value: 4
+                },
+
+                {
+                    text: "Analytics or AI helps identify unusual cases, prioritize them, and determine where human review is needed.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Banking Process Automation",
+
+            text: "How does the bank measure and improve the performance of automated processes?",
+
+            options: [
+
+                {
+                    text: "Process performance is mainly reviewed manually, and there is little systematic measurement.",
+                    value: 1
+                },
+
+                {
+                    text: "The bank tracks completion of some automated tasks but does not consistently measure the full process.",
+                    value: 2
+                },
+
+                {
+                    text: "The bank measures performance for selected digital workflows, such as completion time or processing volume.",
+                    value: 3
+                },
+
+                {
+                    text: "The bank uses operational dashboards to monitor processing time, exceptions, and results across major automated processes.",
+                    value: 4
+                },
+
+                {
+                    text: "The bank continuously uses performance data, analytics, or AI to identify problems and improve automated processes while maintaining required human controls.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        // =====================================================
+        // DIMENSION 4: AI AND ADVANCED ANALYTICS DEPLOYMENT
+        // =====================================================
+
+        {
+            dimension: "AI and Advanced Analytics Deployment",
+
+            text: "How extensively are AI, machine learning, or advanced analytics used in regular banking operations?",
+
+            options: [
+
+                {
+                    text: "The bank mainly uses historical reports, spreadsheets, and basic dashboards; AI and machine learning are not used in regular operations.",
+                    value: 1
+                },
+
+                {
+                    text: "Individual teams are testing AI, machine learning, predictive analytics, or generative AI, but most uses remain pilots.",
+                    value: 2
+                },
+
+                {
+                    text: "AI or advanced analytics is used in selected production areas such as fraud detection, credit risk, customer segmentation, forecasting, or customer service.",
+                    value: 3
+                },
+
+                {
+                    text: "AI and advanced analytics are used across several banking functions and are connected to operational systems or customer channels.",
+                    value: 4
+                },
+
+                {
+                    text: "AI and advanced analytics are used across multiple customer and operational areas with measurable business value and reliable, governed data.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "AI and Advanced Analytics Deployment",
+
+            text: "How are AI and machine-learning models monitored after they are placed into production?",
+
+            options: [
+
+                {
+                    text: "There are no production AI models requiring regular monitoring.",
+                    value: 1
+                },
+
+                {
+                    text: "Pilot projects may have informal or team-specific checks, but there is no consistent monitoring process.",
+                    value: 2
+                },
+
+                {
+                    text: "Production models are monitored for basic performance, and teams review results when problems occur.",
+                    value: 3
+                },
+
+                {
+                    text: "The bank has formal processes to monitor model performance, manage model risk, explain results, and meet regulatory requirements.",
+                    value: 4
+                },
+
+                {
+                    text: "Models are continuously monitored using governed data, with ongoing controls for performance, risk, explainability, security, compliance, and appropriate human review.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "AI and Advanced Analytics Deployment",
+
+            text: "How are AI or advanced-analytics outputs used in banking decisions?",
+
+            options: [
+
+                {
+                    text: "Decisions rely on reports, spreadsheets, or manual analysis rather than AI or advanced analytics.",
+                    value: 1
+                },
+
+                {
+                    text: "AI or analytics outputs are mainly reviewed in pilots or experiments and are not part of routine decisions.",
+                    value: 2
+                },
+
+                {
+                    text: "AI or analytics results support selected recurring decisions such as fraud review, credit risk, forecasting, or customer segmentation.",
+                    value: 3
+                },
+
+                {
+                    text: "AI outputs are integrated into operational systems or customer channels and support decisions across several banking functions.",
+                    value: 4
+                },
+
+                {
+                    text: "AI-supported decisions are used across multiple customer and operational areas, measured for business value, and combined with appropriate human review, security, and compliance controls.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        // =====================================================
+        // DIMENSION 5: ORGANIZATIONAL CHANGE CAPACITY
+        // =====================================================
+
+        {
+            dimension: "Organizational Change Capacity",
+
+            text: "Who is responsible for managing employee adoption when a major digital system or process is introduced?",
+
+            options: [
+
+                {
+                    text: "The IT department mainly manages the implementation, while employee training and adoption are handled informally or after launch.",
+                    value: 1
+                },
+
+                {
+                    text: "Some projects include business participation, communication, or training, but responsibilities differ between projects.",
+                    value: 2
+                },
+
+                {
+                    text: "Major digital projects have identified owners, cross-functional teams, employee training, and defined adoption goals.",
+                    value: 3
+                },
+
+                {
+                    text: "Business and technology leaders jointly manage digital change, with leadership regularly reviewing employee adoption and business results.",
+                    value: 4
+                },
+
+                {
+                    text: "Digital change is embedded into regular operations, with continuing skills development, feedback, and structured processes for scaling successful changes.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Organizational Change Capacity",
+
+            text: "How does the bank measure whether employees actually adopt new digital systems or processes?",
+
+            options: [
+
+                {
+                    text: "The bank does not systematically measure employee adoption after implementation.",
+                    value: 1
+                },
+
+                {
+                    text: "Some projects collect informal feedback or training participation, but adoption measurement is inconsistent.",
+                    value: 2
+                },
+
+                {
+                    text: "Major projects track measures such as system usage, training completion, or process adoption after implementation.",
+                    value: 3
+                },
+
+                {
+                    text: "Leadership regularly reviews employee adoption together with business results and uses the findings to improve implementation.",
+                    value: 4
+                },
+
+                {
+                    text: "The bank continuously uses employee feedback, adoption data, skills development, and business results to improve and expand digital changes.",
+                    value: 5
+                }
+
+            ]
+        },
+
+
+        {
+            dimension: "Organizational Change Capacity",
+
+            text: "What happens when a digital initiative has been successful and the bank wants to expand it to other departments?",
+
+            options: [
+
+                {
+                    text: "Expansion is handled individually, usually through informal coordination between departments.",
+                    value: 1
+                },
+
+                {
+                    text: "Some successful projects are expanded, but the process varies by project and department.",
+                    value: 2
+                },
+
+                {
+                    text: "Major digital initiatives have identified owners and cross-functional processes for expansion.",
+                    value: 3
+                },
+
+                {
+                    text: "The bank has a repeatable process for moving successful digital initiatives across departments, supported by business and technology leadership.",
+                    value: 4
+                },
+
+                {
+                    text: "Continuous organizational change is part of normal operations, with successful practices routinely improved, expanded, and supported through ongoing employee development.",
+                    value: 5
+                }
+
+            ]
+        }
+
+    ];
+
+
+    /*
+    ============================================================
+    3. INTERPRETATION PROFILES
+    ============================================================
+    */
+
+    const profiles = {
+
+        foundational: {
+
+            name: "Foundational Rebuild",
+
+            meaning:
+                "The bank is still developing basic digital capabilities and relies on disconnected systems, manual processes, or limited digital services. Advanced technologies may be difficult to scale until these foundations are strengthened.",
+
+            action:
+                "Prioritize the lowest-scoring foundational capability, such as connecting core data systems or digitizing a highly manual process."
+
+        },
+
+
+        digitalFoundation: {
+
+            name: "Digital Foundation",
+
+            meaning:
+                "The bank has strong capabilities across data, customer experience, automation, AI and analytics, and organizational change. The focus can shift toward creating measurable business value and maintaining these capabilities.",
+
+            action:
+                "Identify high-value opportunities for AI, advanced analytics, or intelligent automation that can improve customer or operational outcomes."
+
+        },
+
+
+        dataConstraint: {
+
+            name: "Data Constraint",
+
+            meaning:
+                "The bank may have strong digital channels, automation, or AI capabilities, but limited data integration can restrict how effectively these capabilities work together. Employees may also spend significant time locating, preparing, or reconciling data.",
+
+            action:
+                "Strengthen data integration and governance through standardized definitions, clear ownership, automated pipelines, and secure access."
+
+        },
+
+
+        digitalizedNotTransforming: {
+
+            name: "Digitalized but Not Transforming",
+
+            meaning:
+                "The bank provides strong digital access and connected customer channels but has limited use of AI and advanced analytics in operations and decision-making. Digital capabilities improve access and convenience without substantially changing data-driven decision-making.",
+
+            action:
+                "Move a small number of high-value AI or analytics use cases, such as fraud detection, credit risk, personalization, or forecasting, from pilots into production."
+
+        },
+
+
+        executionGap: {
+
+            name: "Execution Gap",
+
+            meaning:
+                "The bank may have strong technology, data, automation, or AI capabilities, but employees and departments may struggle to adopt and scale new digital initiatives. This can limit the impact of existing investments.",
+
+            action:
+                "Strengthen change management through employee training, cross-functional ownership, adoption measurement, and a repeatable process for expanding successful initiatives."
+
+        }
+
+    };
+
+
+    /*
+    ============================================================
+    4. GENERATE THE QUESTIONS ON THE PAGE
+    ============================================================
+    */
+
+    const questionsContainer =
+        document.getElementById("questions");
+
+
+    questions.forEach((question, index) => {
+
+        /*
+        Check whether this is the first question
+        for a particular dimension.
+        */
+
+        const previousQuestion = questions[index - 1];
+
+        if (
+            index === 0 ||
+            previousQuestion.dimension !== question.dimension
+        ) {
+
+            const dimensionDiv =
+                document.createElement("div");
+
+            dimensionDiv.className = "dimension";
+
+            dimensionDiv.innerHTML = `
+                <h2>${question.dimension}</h2>
+            `;
+
+            questionsContainer.appendChild(dimensionDiv);
+
+        }
+
+
+        /*
+        Find the most recently created dimension section.
+        */
+
+        const dimensionSections =
+            document.querySelectorAll(".dimension");
+
+        const currentDimension =
+            dimensionSections[dimensionSections.length - 1];
+
+
+        /*
+        Create the question.
+        */
+
+        const questionDiv =
+            document.createElement("div");
+
+        questionDiv.className = "question";
+
+
+        questionDiv.innerHTML = `
+            <h3>
+                Question ${index + 1}: ${question.text}
+            </h3>
+        `;
+
+
+        /*
+        Add all five answer choices.
+        */
+
+        question.options.forEach(option => {
+
+            const answerLabel =
+                document.createElement("label");
+
+            answerLabel.className = "answer";
+
+            answerLabel.innerHTML = `
+                <input
+                    type="radio"
+                    name="question${index}"
+                    value="${option.value}"
+                >
+
+                <strong>${option.value}</strong> —
+                ${option.text}
+            `;
+
+            questionDiv.appendChild(answerLabel);
+
+        });
+
+
+        currentDimension.appendChild(questionDiv);
+
+    });
+
+
+    /*
+    ============================================================
+    5. SUBMIT THE ASSESSMENT
+    ============================================================
+    */
+
+    document
+        .getElementById("assessmentForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+
+            const answers = [];
+
+            let allAnswered = true;
+
+
+            /*
+            Check every question.
+            */
+
+            for (let i = 0; i < questions.length; i++) {
+
+                const selected =
+                    document.querySelector(
+                        `input[name="question${i}"]:checked`
+                    );
+
+
+                if (!selected) {
+
+                    allAnswered = false;
+
+                    break;
+
+                }
+
+
+                answers.push(
+                    Number(selected.value)
+                );
+
+            }
+
+
+            /*
+            If a question is unanswered,
+            do not show results.
+            */
+
+            if (!allAnswered) {
+
+                document.getElementById(
+                    "errorMessage"
+                ).style.display = "block";
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+                return;
+
+            }
+
+
+            /*
+            Hide error message.
+            */
+
+            document.getElementById(
+                "errorMessage"
+            ).style.display = "none";
+
+
+            /*
+            Calculate the five scores.
+            */
+
+            calculateResults(answers);
+
+        });
+
+
+    /*
+    ============================================================
+    6. CALCULATE DIMENSION SCORES
+    ============================================================
+    */
+
+    function calculateResults(answers) {
+
+        /*
+        Create an empty array for each dimension.
+        */
+
+        const dimensionValues = {};
+
+
+        dimensions.forEach(dimension => {
+
+            dimensionValues[dimension] = [];
+
+        });
+
+
+        /*
+        Put each answer into the correct dimension.
+        */
+
+        questions.forEach((question, index) => {
+
+            dimensionValues[
+                question.dimension
+            ].push(answers[index]);
+
+        });
+
+
+        /*
+        Calculate the average for each dimension.
+        */
+
+        const averages = {};
+
+
+        dimensions.forEach(dimension => {
+
+            const values =
+                dimensionValues[dimension];
+
+
+            const total =
+                values.reduce(
+                    (sum, value) => sum + value,
+                    0
+                );
+
+
+            const average =
+                total / values.length;
+
+
+            averages[dimension] =
+                Number(average.toFixed(2));
+
+        });
+
+
+        /*
+        Send the results to the display function.
+        */
+
+        displayResults(averages);
+
+    }
+
+
+    /*
+    ============================================================
+    7. FIND THE TWO LOWEST DIMENSIONS
+    ============================================================
+    */
+
+    function findLowestDimensions(averages) {
+
+        /*
+        Convert the object into an array:
+
+        [
+            ["Banking Data Infrastructure", 3.67],
+            ["Digital Banking...", 4.33],
+            ...
+        ]
+        */
+
+        const sorted =
+            Object.entries(averages)
+                .sort((a, b) => a[1] - b[1]);
+
+
+        /*
+        Find the lowest score.
+        */
+
+        const lowestScore =
+            sorted[0][1];
+
+
+        /*
+        Find all dimensions tied at the
+        lowest score.
+        */
+
+        const tiedLowest =
+            sorted.filter(
+                item => item[1] === lowestScore
+            );
+
+
+        /*
+        If two or more dimensions are tied
+        for the lowest score, return all of them.
+        */
+
+        if (tiedLowest.length >= 2) {
+
+            return tiedLowest.map(
+                item => item[0]
+            );
+
+        }
+
+
+        /*
+        Otherwise return the two lowest.
+        */
+
+        return [
+            sorted[0][0],
+            sorted[1][0]
+        ];
+
+    }
+
+
+    /*
+    ============================================================
+    8. DETERMINE INTERPRETATION PROFILE
+    ============================================================
+    */
+
+    function determineProfile(averages) {
+
+        const values =
+            Object.values(averages);
+
+
+        /*
+        PROFILE 1:
+        Foundational Rebuild
+
+        Most dimensions are 1–2.
+        */
+
+        const allLow =
+            values.every(
+                score => score <= 2
+            );
+
+
+        /*
+        PROFILE 2:
+        Digital Foundation
+
+        Most dimensions are 4–5.
+        */
+
+        const allHigh =
+            values.every(
+                score => score >= 4
+            );
+
+
+        /*
+        Find the average of the other
+        four dimensions for comparison.
+        */
+
+        const otherDimensions = dimension => {
+
+            return dimensions
+                .filter(item => item !== dimension)
+                .map(item => averages[item]);
+
+        };
+
+
+        /*
+        PROFILE 3:
+        Data Constraint
+
+        Data Infrastructure is at least
+        one full point lower than every
+        other dimension.
+        */
+
+        const dataScore =
+            averages[
+                "Banking Data Infrastructure"
+            ];
+
+
+        const dataConstraint =
+            otherDimensions(
+                "Banking Data Infrastructure"
+            )
+            .every(
+                score => dataScore <= score - 1
+            );
+
+
+        /*
+        PROFILE 4:
+        Digitalized but Not Transforming
+
+        Digital customer experience is high
+        while AI/analytics is low.
+        */
+
+        const digitalizedNotTransforming =
+
+            averages[
+                "Digital Banking and Customer Experience"
+            ] >= 4 &&
+
+            averages[
+                "AI and Advanced Analytics Deployment"
+            ] <= 3;
+
+
+        /*
+        PROFILE 5:
+        Execution Gap
+
+        Organizational Change Capacity is
+        at least one full point lower than
+        every other dimension.
+        */
+
+        const changeScore =
+            averages[
+                "Organizational Change Capacity"
+            ];
+
+
+        const executionGap =
+            otherDimensions(
+                "Organizational Change Capacity"
+            )
+            .every(
+                score => changeScore <= score - 1
+            );
+
+
+        /*
+        Return the matching profile.
+        */
+
+        if (allLow) {
+
+            return profiles.foundational;
+
+        }
+
+
+        if (allHigh) {
+
+            return profiles.digitalFoundation;
+
+        }
+
+
+        if (dataConstraint) {
+
+            return profiles.dataConstraint;
+
+        }
+
+
+        if (digitalizedNotTransforming) {
+
+            return profiles.digitalizedNotTransforming;
+
+        }
+
+
+        if (executionGap) {
+
+            return profiles.executionGap;
+
+        }
+
+
+        /*
+        If no exact profile matches,
+        return null.
+        */
+
+        return null;
+
+    }
+
+
+    /*
+    ============================================================
+    9. CREATE RADAR CHART
+    ============================================================
+    */
+
+    let radarChart = null;
+
+
+    function createRadarChart(averages) {
+
+        const canvas =
+            document.getElementById(
+                "maturityRadar"
+            );
+
+
+        const ctx =
+            canvas.getContext("2d");
+
+
+        /*
+        Destroy an existing chart before
+        creating a new one.
+        */
+
+        if (radarChart) {
+
+            radarChart.destroy();
+
+        }
+
+
+        /*
+        Create the radar chart.
+        */
+
+        radarChart = new Chart(ctx, {
+
+            type: "radar",
+
+
+            data: {
+
+                labels: dimensions,
+
+
+                datasets: [
+
+                    {
+
+                        label: "Maturity Score",
+
+
+                        data: dimensions.map(
+                            dimension =>
+                                averages[dimension]
+                        ),
+
+
+                        borderWidth: 2,
+
+
+                        pointRadius: 5,
+
+
+                        fill: true
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+
+                maintainAspectRatio: false,
+
+
+                scales: {
+
+                    r: {
+
+                        min: 1,
+
+                        max: 5,
+
+                        ticks: {
+
+                            stepSize: 1
+
+                        },
+
+                        pointLabels: {
+
+                            font: {
+
+                                size: 11
+
+                            },
+
+                            padding: 10
+
+                        }
+
+                    }
+
+                },
+
+
+                plugins: {
+
+                    legend: {
+
+                        display: true
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+    /*
+    ============================================================
+    10. DISPLAY SCORE SUMMARY
+    ============================================================
+    */
+
+    function displayScoreSummary(averages) {
+
+        const summary =
+            document.getElementById(
+                "scoreSummary"
+            );
+
+
+        let html = `
+            <h3>Dimension Scores</h3>
+
+            <ul class="score-list">
+        `;
+
+
+        dimensions.forEach(dimension => {
+
+            html += `
+
+                <li>
+
+                    <strong>
+                        ${dimension}
+                    </strong>
+
+                    :
+                    ${averages[dimension].toFixed(2)}
+                    / 5
+
+                </li>
+
+            `;
+
+        });
+
+
+        html += "</ul>";
+
+
+        summary.innerHTML = html;
+
+    }
+
+
+    /*
+    ============================================================
+    11. DISPLAY THE TWO LOWEST DIMENSIONS
+    ============================================================
+    */
+
+    function displayLowestDimensions(
+        averages,
+        lowestDimensions
+    ) {
+
+        const container =
+            document.getElementById(
+                "lowestDimensions"
+            );
+
+
+        let html = `
+
+            <div class="lowest-box">
+
+                <h3>
+                    Lowest-Scoring Dimensions
+                </h3>
+
+                <p>
+                    Your assessment identifies
+                    the following dimension(s) as
+                    your lowest-scoring areas:
+                </p>
+
+                <ul>
+
+        `;
+
+
+        lowestDimensions.forEach(dimension => {
+
+            html += `
+
+                <li>
+
+                    <strong>
+                        ${dimension}
+                    </strong>
+
+                    —
+                    ${averages[dimension].toFixed(2)}
+                    / 5
+
+                </li>
+
+            `;
+
+        });
+
+
+        html += `
+
+                </ul>
+
+            </div>
+
+        `;
+
+
+        container.innerHTML = html;
+
+    }
+
+
+    /*
+    ============================================================
+    12. DISPLAY INTERPRETATION PROFILE
+    ============================================================
+    */
+
+    function displayInterpretation(
+        averages,
+        lowestDimensions
+    ) {
+
+        const interpretation =
+            document.getElementById(
+                "interpretation"
+            );
+
+
+        const profile =
+            determineProfile(averages);
+
+
+        let html = "";
+
+
+        /*
+        If one of the five profiles matches,
+        display it.
+        */
+
+        if (profile) {
+
+            html = `
+
+                <div class="profile-box">
+
+                    <h3>
+                        Strategic Profile:
+                        ${profile.name}
+                    </h3>
+
+                    <p>
+                        <strong>What this means:</strong>
+                    </p>
+
+                    <p>
+                        ${profile.meaning}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Recommended Next Action:
+                        </strong>
+                    </p>
+
+                    <p>
+                        ${profile.action}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+        /*
+        If no exact profile matches,
+        provide a general interpretation
+        based on the two lowest dimensions.
+        */
+
+        else {
+
+            html = `
+
+                <div class="profile-box">
+
+                    <h3>
+                        Strategic Interpretation
+                    </h3>
+
+                    <p>
+                        Your results do not match
+                        one of the five predefined
+                        strategic profiles exactly.
+                    </p>
+
+                    <p>
+                        Based on your score pattern,
+                        focus first on the two
+                        lowest-scoring dimensions
+                        identified above.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+        interpretation.innerHTML = html;
+
+    }
+
+
+    /*
+    ============================================================
+    13. DISPLAY ALL RESULTS
+    ============================================================
+    */
+
+    function displayResults(averages) {
+
+        /*
+        Find the lowest dimensions.
+        */
+
+        const lowestDimensions =
+            findLowestDimensions(averages);
+
+
+        /*
+        Show the results section.
+        */
+
+        document.getElementById(
+            "results"
+        ).style.display = "block";
+
+
+        /*
+        Create radar chart.
+        */
+
+        createRadarChart(averages);
+
+
+        /*
+        Display numerical scores.
+        */
+
+        displayScoreSummary(averages);
+
+
+        /*
+        Display lowest dimensions.
+        */
+
+        displayLowestDimensions(
+            averages,
+            lowestDimensions
+        );
+
+
+        /*
+        Display strategic interpretation.
+        */
+
+        displayInterpretation(
+            averages,
+            lowestDimensions
+        );
+
+
+        /*
+        Scroll the user down to results.
+        */
+
+        document.getElementById(
+            "results"
+        ).scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+</script>
+
+</body>
+</html>
